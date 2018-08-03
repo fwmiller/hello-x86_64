@@ -1,10 +1,10 @@
 # hello-x86_64
 
-This program is a precursor to the development of a new 64-bit OS.  The
-program runs as a standalone application on a 64-bit X86 machine.  The
-program will dump some output and then present the user with a simple
+This image is a precursor to the development of a new 64-bit OS.  The
+image runs as a standalone application on a 64-bit X86 machine.  The
+image will dump some output and then present the user with a simple
 echo command line.  You can type anything and it will be echo'd back to
-you.  The program is setup to run in a qemu virtual machine.  It uses
+you.  The image is setup to run in a qemu virtual machine.  It uses
 simple UART access to send and receive characters from the user.
 
 This code is based on https://github.com/winksaville/baremetal-x86_64
