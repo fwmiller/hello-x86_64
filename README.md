@@ -10,3 +10,16 @@ simple UART access to send and receive characters from the user.
 This code is based on https://github.com/winksaville/baremetal-x86_64
 but has been modified quite a bit.  Even so I've included the required
 Apache license document as required.
+
+To run this you will need to have xorriso and qemu installed on your
+Linux distro.  For Ubuntu you can do this:
+
+```
+$ sudo apt-get install xorriso qemu
+```
+
+One you have these installed you can type:
+
+```
+$ make run
+```
