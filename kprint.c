@@ -1,4 +1,4 @@
-int putchar(int ch);
+int uart_putchar(int ch);
 
 void
 kprint(char *s)
@@ -7,5 +7,5 @@ kprint(char *s)
 		return;
 
 	for (; *s != 0; s++)
-		putchar(*s);
+		uart_putchar(*s);
 }
