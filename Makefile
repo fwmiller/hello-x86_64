@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -c -Wall -m64 -Og -nostdinc -ffreestanding
 LD = gcc
-LDFLAGS = -nostdlib -Wl,-n,-T,link.ld
+LDFLAGS = -nostdlib -Wl,-n,-T,link.ld -no-pie
 RM = rm -fr
 
 OBJS = boot.o mb2.o kprint.o kmain.o uart.o
