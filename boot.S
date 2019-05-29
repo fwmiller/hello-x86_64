@@ -19,57 +19,62 @@
  * from nasm to gas (gnu assembler).
  */
 
-  // Global Descriptor Table
-  .section .rodata
-  .align 4
+	// Global Descriptor Table
+	.section .rodata
+	.align		4
 gdt64:
-  .quad 0 // zero entry
+	.quad		0 // zero entry
 
 gdt64_code_entry:
-  .set gdt64_code_seg, gdt64_code_entry - gdt64
-  .quad (1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53) // code segment
+	.set		gdt64_code_seg, gdt64_code_entry - gdt64
+	.quad		(1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53) // code segment
 
 gdt64_data_entry:
-  .set gdt64_data_seg, gdt64_data_entry - gdt64
-  .quad (1<<44) | (1<<47) | (1<<41) // data segment
+	.set		gdt64_data_seg, gdt64_data_entry - gdt64
+	.quad		(1<<44) | (1<<47) | (1<<41) // data segment
 
 gdt64_pointer:
-  .set gdt64_limit, gdt64_pointer - gdt64 - 1
-  .word gdt64_limit
-  .quad gdt64
+	.set		gdt64_limit, gdt64_pointer - gdt64 - 1
+	.word		gdt64_limit
+	.quad		gdt64
 
 
-  // Entry code
-  .global _start
-  .extern kmain
+	// Entry code
+	.global		_start
+	.extern		kmain
 
-  .section .text
-  .code32
+	.section .text
+	.code32
 _start:
-    movl $stack_top, %esp
-    // Move Multiboot info pointer to edi to pass it to the kernel. We must not
-    // modify the `edi` register until the kernel it called.
-    movl %ebx, %edi
+	movl		$stack_top, %esp
 
-    call check_multiboot
-    call check_cpuid
-    call check_long_mode
+	// Move Multiboot info pointer to edi to pass it to the kernel. We must not
+	// modify the `edi` register until the kernel it called.
+	movl		%ebx, %edi
 
-    call set_up_page_tables
-    call enable_paging
-    call set_up_SSE
+	call		check_multiboot
+	call		check_cpuid
+	call		check_long_mode
 
-    // load the 64-bit GDT
-    lgdt (gdt64_pointer)
+	call		set_up_page_tables
+	call		enable_paging
+	call		set_up_SSE
 
-    // update selectors
-    movw $gdt64_data_seg, %ax
-    movw %ax, %ss
-    movw %ax, %ds
-    movw %ax, %es
+	// load the 64-bit GDT
+	lgdt		(gdt64_pointer)
 
-    // edi = multiboot info
-    ljmp  $gdt64_code_seg, $kmain
+	// update selectors
+	movw		$gdt64_data_seg, %ax
+	movw		%ax, %ss
+	movw		%ax, %ds
+	movw		%ax, %es
+
+	// edi = multiboot info
+	ljmp		$gdt64_code_seg, $kmain
+
+
+//=======================================================================
+
 
 set_up_page_tables:
     // recursive map P4
