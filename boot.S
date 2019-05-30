@@ -72,40 +72,38 @@ _start:
 	// edi = multiboot info
 	ljmp		$gdt64_code_seg, $kmain
 
+set_up_page_tables:
+	// recursive map P4
+	mov			$p4_table, %eax
+	orl			$0b11, %eax			// present + writable
+	movl		%eax, (p4_table + 511 * 8)
+
+	// map first P4 entry to P3 table
+	movl		$p3_table, %eax
+	orl			$0b11, %eax			// present + writable
+	movl		%eax, (p4_table)
+
+	// map first P3 entry to P2 table
+	movl		$p2_table, %eax
+	orl			$0b11, %eax			// present + writable
+	mov			%eax, (p3_table)
+
+	// map each P2 entry to a huge 2MiB page
+	movl		$0, %ecx			// counter variable
+map_p2_table:
+	// map ecx-th P2 entry to a huge page that starts at address (2MiB * ecx)
+	movl		$0x200000, %eax		// 2MiB
+	mul			%ecx				// start address of ecx-th page
+	orl			$0b10000011, %eax	// present + writable + huge
+	movl		%eax, p2_table(,%ecx,8) // map ecx-th entry
+
+	inc			%ecx				// increase counter
+	cmp			$512, %ecx			// if counter == 512, the whole P2 table is mapped
+	jne			map_p2_table		// else map the next entry
+
+	ret
 
 //=======================================================================
-
-
-set_up_page_tables:
-    // recursive map P4
-    mov $p4_table, %eax
-    orl $0b11, %eax       // present + writable
-    movl %eax, (p4_table + 511 * 8)
-
-    // map first P4 entry to P3 table
-    movl $p3_table, %eax
-    orl $0b11, %eax       // present + writable
-    movl %eax, (p4_table)
-
-    // map first P3 entry to P2 table
-    movl $p2_table, %eax
-    orl $0b11, %eax       // present + writable
-    mov %eax, (p3_table)
-
-    // map each P2 entry to a huge 2MiB page
-    movl $0, %ecx         // counter variable
-map_p2_table:
-    // map ecx-th P2 entry to a huge page that starts at address (2MiB * ecx)
-    movl $0x200000, %eax  // 2MiB
-    mul %ecx              // start address of ecx-th page
-    orl $0b10000011, %eax // present + writable + huge
-    movl %eax, p2_table(,%ecx,8) // map ecx-th entry
-
-    inc %ecx              // increase counter
-    cmp $512, %ecx        // if counter == 512, the whole P2 table is mapped
-    jne map_p2_table      // else map the next entry
-
-    ret
 
 enable_paging:
     // load P4 to cr3 register (cpu uses this to access the P4 table)
