@@ -1,11 +1,15 @@
+INCDIR = ../include
+
 CC = gcc
 CFLAGS = -c -Wall -m64 -Og -nostdinc -ffreestanding
 LD = gcc
 LDFLAGS = -nostdlib -Wl,-n,-T,link.ld -no-pie
 RM = rm -fr
 
-OBJS = boot.o mb2.o kprint.o kmain.o uart.o
+OBJS = boot.o mb2.o kmain.o print.o string.o uart.o
 KERNEL = kmain.elf
+
+INDENT_RULES = -nbad -bap -nbc -bbo -hnl -br -brs -c33 -cd33 -ncdb -ce -ci4 -cli0 -d0 -di1 -nfc1 -i8 -ip0 -l80 -lp -npcs -nprs -npsl -sai -saf -saw -ncs -nsc -sob -nfca -cp33 -ss -ts8 -il1
 
 all: build
 
@@ -22,8 +26,12 @@ run: build
 clean:
 	$(RM) $(OBJS) $(KERNEL) isofiles iso.img
 
+indent: clean
+	indent $(INDENT_RULES) *.c
+	rm *~
+
 .c.o:
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -I$(INCDIR) -o $@ $<
 
 .S.o:
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -I$(INCDIR) -o $@ $<
