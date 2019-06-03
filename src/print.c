@@ -1,16 +1,34 @@
-#if 0
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#endif
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-void uint2str(uint_t v, char *s, int base);
 int uart_putchar(int ch);
+
+void uint2str(uint_t v, char *s, int base)
+{
+	if (v == 0) {
+		s[0] = '0';
+		s[1] = '\0';
+	} else {
+		char s1[80];
+		uint_t v1;
+		int i = 0, j = 0;
+
+		while (v > 0) {
+			v1 = v % base;
+			if (v1 < 10)
+				s1[i++] = v1 + '0';
+			else
+				s1[i++] = v1 - 10 + 'a';
+			v /= base;
+		}
+		while (i > 0)
+			s[j++] = s1[--i];
+		s[j] = '\0';
+	}
+}
 
 static void put1(char *s, int *pos, int c)
 {
@@ -21,7 +39,7 @@ static void put1(char *s, int *pos, int c)
 	uart_putchar(c);
 }
 
-void print(char *string, int *pos, const char *fmt, va_list args)
+static void print(char *string, int *pos, const char *fmt, va_list args)
 {
 	int len;
 	char pad;

@@ -27,8 +27,9 @@ clean:
 	$(RM) $(OBJS) $(KERNEL) isofiles iso.img
 
 indent: clean
+	cd ../include;indent $(INDENT_RULES) *.h
 	indent $(INDENT_RULES) *.c
-	rm *~
+	rm ../include/*~ *~
 
 .c.o:
 	$(CC) $(CFLAGS) -I$(INCDIR) -o $@ $<
